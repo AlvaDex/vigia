@@ -1,32 +1,52 @@
-from fastapi import FastAPI, HTTPException
 from datetime import datetime, timezone
-from app.models import LogEntry, LogIngestResponse
+
+from fastapi import FastAPI, Query
+
+from app.detection import DetectionEngine, load_rules
+from app.models import Alert, LogEntry, LogIngestResponse, StoredLog
 
 app = FastAPI(
     title="Vigía API",
-    description="Lightweight attack detection platform",
     version="0.1.0",
+    description="Lightweight attack detection for small businesses.",
 )
 
-# in-memory database (temporary; I'll switch to PostgreSQL later)
-log_database: list[LogEntry] = []
+# In-memory storage (PostgreSQL comes later)
+log_database: list[StoredLog] = []
+engine = DetectionEngine(load_rules())
+
 
 @app.get("/health")
-def health_check():
-    return {"status": "ok", "service":"vigia", "timestamp":datetime.now(timezone.utc)}
+def health():
+    return {"status": "ok", "rules_loaded": len(engine.rules)}
+
 
 @app.post("/api/v1/logs", response_model=LogIngestResponse, status_code=201)
-def ingest_log(log: LogEntry):
-    """It receives a log, assigns it an ID and a timestamp, and saves it."""
-    entry = log.model_copy(update={
-        "id": len(log_database) + 1,
-        "received_at": datetime.now(timezone.utc),
-    })
-    log_database.append(entry)
-    return LogIngestResponse(id=entry.id, message="Log ingested sucessfully")
+def ingest_log(entry: LogEntry):
+    stored = StoredLog(
+        **entry.model_dump(),
+        id=len(log_database) + 1,
+        received_at=datetime.now(timezone.utc),
+    )
+    log_database.append(stored)
+    new_alerts = engine.process(stored, log_database)
+    return LogIngestResponse(
+        id=stored.id,
+        message="Log ingested successfully",
+        alerts_triggered=len(new_alerts),
+    )
 
-@app.get("/api/v1/logs", response_model=list[LogEntry])
-def list_logs(limit: int = 50):
-    if limit < 1 or limit > 500:
-        raise HTTPException(status_code=400, detail="limit must be between 1 and 500")
+
+@app.get("/api/v1/logs", response_model=list[StoredLog])
+def list_logs(limit: int = Query(100, ge=1, le=500)):
     return log_database[-limit:]
+
+
+@app.get("/api/v1/alerts", response_model=list[Alert])
+def list_alerts():
+    return engine.alerts
+
+
+@app.get("/api/v1/rules")
+def list_rules():
+    return engine.rules
