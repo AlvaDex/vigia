@@ -1,11 +1,15 @@
+<div align="center">
+
 # 🛡️ Vigía
 
 > Lightweight attack detection platform for small businesses, with built-in purple team validation.
 
-![Status](https://img.shields.io/badge/status-in%20development-yellow)
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Python](https://img.shields.io/badge/python-3.14-blue)
-![React](https://img.shields.io/badge/react-typescript-61dafb)
+![Status](https://img.shields.io/badge/status-in%20development-yellow?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
+![Python](https://img.shields.io/badge/python-3.14-3776AB?style=flat-square&logo=python&logoColor=white)
+![React](https://img.shields.io/badge/react-typescript-61DAFB?style=flat-square&logo=react&logoColor=black)
+
+</div>
 
 ---
 
@@ -29,33 +33,37 @@ What makes Vigía different is its **purple team approach**: the repository ship
 
 ## 🏗️ Architecture
 
+```mermaid
 flowchart LR
-  A[Log sourcesnginx / SSH / apps] --> B[Ingestion APIFastAPI]
+  A["Log sources<br/>(nginx / SSH / apps)"] --> B["Ingestion API<br/>(FastAPI)"]
   B --> C[(PostgreSQL)]
-  B --> D[Detection EngineYAML rules]
+  B --> D["Detection Engine<br/>(YAML rules)"]
   D --> C
-  C --> E[DashboardReact + TS]
-  F[attack-simRed team scripts] -.validates.-> D
+  C --> E["Dashboard<br/>(React + TS)"]
+  F["attack-sim<br/>(Red team scripts)"] -. validates .-> D
+```
 
 ## 🧰 Tech Stack
 
 | Layer | Technology |
-|---|---|
-| Backend | Python 3.14, FastAPI, SQLAlchemy |
-| Frontend | React, TypeScript, Vite, Tailwind CSS |
-| Database | PostgreSQL |
-| Detection rules | YAML (Sigma-inspired) |
-| Attack simulation | Python scripts in an isolated Docker lab |
-| DevOps | Docker Compose, GitHub Actions |
+| :--- | :--- |
+| **Backend** | Python 3.14, FastAPI, SQLAlchemy |
+| **Frontend** | React, TypeScript, Vite, Tailwind CSS |
+| **Database** | PostgreSQL |
+| **Detection rules** | YAML (Sigma-inspired) |
+| **Attack simulation** | Python scripts in an isolated Docker lab |
+| **DevOps** | Docker Compose, GitHub Actions |
 
 ## 📁 Project Structure
 
+```text
 vigia/
 ├── backend/       # FastAPI ingestion API and detection engine
 ├── frontend/      # React + TypeScript dashboard
 ├── attack-sim/    # Red team: controlled attack emulation scripts
 ├── detections/    # Blue team: YAML detection rules
 └── docs/          # Threat model, architecture and design decisions
+```
 
 ## 🗺️ Roadmap
 
