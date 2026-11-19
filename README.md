@@ -4,7 +4,7 @@
 
 ![Status](https://img.shields.io/badge/status-in%20development-yellow)
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Python](https://img.shields.io/badge/python-3.14-blue)
+![Python](https://img.shields.io/badge/python-3.15-blue)
 ![React](https://img.shields.io/badge/react-typescript-61dafb)
 
 ---
@@ -41,7 +41,7 @@ flowchart LR
 
 | Layer | Technology |
 |---|---|
-| Backend | Python 3.14, FastAPI, SQLAlchemy |
+| Backend | Python 3.15, FastAPI, SQLAlchemy |
 | Frontend | React, TypeScript, Vite, Tailwind CSS |
 | Database | PostgreSQL |
 | Detection rules | YAML (Sigma-inspired) |
@@ -68,9 +68,31 @@ vigia/
 - [ ] **Phase 6** – CI/CD, tests and security scanning (SAST, dependency audit)
 - [ ] **Phase 7** – Public demo deployment
 
-## 🚀 Getting Started
+## 🚀 Getting Started (backend preview)
 
-> Coming soon. Vigía will run with a single `docker compose up` command.
+```bash
+cd backend
+python -m venv .venv
+
+# Windows (PowerShell)
+.venv\Scripts\activate
+# Linux / macOS
+# source .venv/bin/activate
+
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+Then open `http://127.0.0.1:8000/docs` for the interactive API docs.
+
+Log ingestion example (PowerShell):
+
+```powershell
+$body = @'
+{"source": "ssh", "level": "warning", "message": "Failed password for root from 203.0.113.5", "source_ip": "203.0.113.5"}
+'@
+Invoke-RestMethod -Uri http://127.0.0.1:8000/api/v1/logs -Method Post -ContentType "application/json" -Body $body
+```
 
 ## ⚠️ Ethical Use
 
