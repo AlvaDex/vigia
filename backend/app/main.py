@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from fastapi import FastAPI, Query
 
 from app.detection import DetectionEngine, load_rules
-from app.models import Alert, LogEntry, LogIngestResponse, StoredLog
+from app.models import Alert, LogEntry, LogIngestResponse, Severity,StoredLog
 
 app = FastAPI(
     title="Vigía API",
@@ -43,8 +43,10 @@ def list_logs(limit: int = Query(100, ge=1, le=500)):
 
 
 @app.get("/api/v1/alerts", response_model=list[Alert])
-def list_alerts():
-    return engine.alerts
+def list_alerts(severity: Severity | None = None):
+    if severity is None:
+        return engine.alerts
+    return [alert for alert in engine.alerts if alert.severity == severity]
 
 
 @app.get("/api/v1/rules")
