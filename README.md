@@ -102,6 +102,42 @@ $body = @'
 Invoke-RestMethod -Uri http://127.0.0.1:8000/api/v1/logs -Method Post -ContentType "application/json" -Body $body
 ```
 
+## 🎯 Detection Coverage
+
+| Rule ID  | Title                                 | Log source | MITRE ATT&CK                                  | Severity |
+| :---     | :---                                  | :---       | :---                                          | :---     |
+| VIG-0001 | SSH brute force from single IP        | ssh        | T1110.001 – Brute Force: Password Guessing    | high     |
+| VIG-0002 | Web admin path probing from single IP | nginx      | T1595.003 – Active Scanning: Wordlist Scanning | medium  |
+
+Rules live in [`detections/`](detections/) as YAML files and are loaded automatically at startup.
+
+## 🧪 Running Tests
+
+```powershell
+cd backend
+.venv\Scripts\activate
+python -m pytest -v
+```
+
+## 🔴🟣 Purple Team Simulation
+
+Terminal 1 (API):
+
+```powershell
+cd backend
+.venv\Scripts\activate
+uvicorn app.main:app --reload
+```
+
+Terminal 2 (attacks, from the repository root):
+
+```powershell
+python attack-sim\ssh_bruteforce_sim.py
+python attack-sim\nginx_admin_probe_sim.py
+```
+
+Then check the alerts at `http://127.0.0.1:8000/api/v1/alerts` (filter with `?severity=high`).
+
 ## ⚠️ Ethical Use
 
 The `attack-sim/` module is intended **only** for authorized testing in the provided isolated lab or on systems you own or have explicit written permission to test. Unauthorized use against third-party systems is illegal.
