@@ -1,0 +1,23 @@
+id: VIG-0002
+title: Web admin path probing from single IP
+description: Repeated requests to sensitive or administrative web paths from the same source IP, typical of automated scanners.
+severity: medium
+mitre:
+  tactic: Reconnaissance
+  technique: T1595.003
+  technique_name: "Active Scanning: Wordlist Scanning"
+logsource: nginx
+detection:
+  message_contains:
+    - "/admin"
+    - "/wp-admin"
+    - "/wp-login.php"
+    - "/phpmyadmin"
+    - "/.env"
+    - "/.git"
+  group_by: source_ip
+  threshold: 5
+  timeframe_seconds: 60
+falsepositives:
+  - Legitimate administrators reloading the admin panel
+  - Internal uptime or security scanners

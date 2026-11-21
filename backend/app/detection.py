@@ -28,10 +28,14 @@ def event_time(log: StoredLog) -> datetime:
 
 
 def matches_rule(log: StoredLog, rule: dict) -> bool:
-    return (
-        log.source.value == rule ["logsource"]
-        and rule["detection"]["message_contains"] in log.message
-    )
+    """True if the log comes from the rule's source and contains any pattern."""
+    if log.source.value != rule["logsource"]:
+        return False
+    patterns = rule["detection"]["message_contains"]
+    if isinstance(patterns, str):
+        patterns = [patterns]
+    return any(pattern in log.message for pattern in patterns)
+
 
 
 class DetectionEngine:
