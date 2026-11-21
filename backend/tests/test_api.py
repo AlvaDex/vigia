@@ -34,3 +34,26 @@ def test_brute_force_through_api_creates_alert():
         })
     alerts = client.get("/api/v1/alerts").json()
     assert any(a["source_ip"] == ip and a["mitre_technique"] == "T1110.001" for a in alerts)
+
+
+def test_admin_probe_through_api_creates_alert():
+    ip = "203.0.113.77"
+    for path in ["/admin", "/.env", "/wp-login.php", "/.git/config", "/phpmyadmin"]:
+        client.post("/api/v1/logs", json={
+            "source": "nginx", "level": "warning",
+            "message": f"GET {path} HTTP/1.1 404",
+            "source_ip": ip,
+        })
+    alerts = client.get("/api/v1/alerts").json()
+    assert any(a["source_ip"] == ip and a["rule_id"] == "VIG-0002" for a in alerts)
+
+
+def test_filter_alerts_by_severity():
+    response = client.get("/api/v1/alerts?severity=medium")
+    assert response.status_code == 200
+    assert all(a["severity"] == "medium" for a in response.json())
+
+
+def test_filter_rejects_unknown_severity():
+    response = client.get("/api/v1/alerts?severity=apocalyptic")
+    assert response.status_code == 422
