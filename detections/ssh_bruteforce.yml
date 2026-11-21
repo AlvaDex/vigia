@@ -1,6 +1,6 @@
 id: VIG-0001
 title: SSH brute force from single IP
-descripttion: Multiple failed SSH password attempts from the same source IP in a short time window.
+description: Multiple failed SSH password attempts from the same source IP in a short time window.
 severity: high
 mitre:
   tactic: Credential Access
